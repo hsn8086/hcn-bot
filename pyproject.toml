@@ -7,8 +7,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-python-telegram-bot = "^21.4"
 anyquote = {url = "https://files.pythonhosted.org/packages/29/e6/e4c66b5a7effba6ddad148f1c86474c1ac1adce5d36f5232cfda2529be36/anyquote-0.2.2-py3-none-any.whl"}
+pytelegrambotapi = "^4.22.0"
+aiohttp = "^3.10.3"
 
 
 [build-system]

@@ -24,14 +24,24 @@
 @Date       : 2024/8/11 下午10:36
 """
 import argparse
+import asyncio
 import logging
 import tomllib
 from pathlib import Path
+from typing import Callable
 
-from telegram import Update
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters
+from telebot.async_telebot import AsyncTeleBot
 
-from .handlers import start, quote_handler
+from .handlers import start,quote_handler
+
+
+def handle_builder(bot: AsyncTeleBot):
+    def _add_handler(handler: Callable, **kwargs):
+        @bot.message_handler(**kwargs)
+        async def _handler(message):
+            await handler(bot=bot, message=message)
+
+    return _add_handler
 
 
 def main():
@@ -54,12 +64,13 @@ def main():
         logger.error(f"error loading config file: {e}")
         return
 
-    token = config.get("telegram", {}).get("token", None)
+    token: str = config.get("telegram", {}).get("token", "")
     if token is None or token == "":
         logger.error(f"token not found in config file.")
         return
+    bot = AsyncTeleBot(token)
+    add_handler = handle_builder(bot)
+    add_handler(start, commands=["start"])
+    add_handler(quote_handler, commands=["quote"])
+    asyncio.run(bot.infinity_polling())
 
-    app = Application.builder().token(token=token).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("quote", quote_handler))
-    app.run_polling()

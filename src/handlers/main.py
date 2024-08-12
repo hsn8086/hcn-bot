@@ -23,9 +23,9 @@
 
 @Date       : 2024/8/11 下午10:45
 """
-from telegram import Update
 
-
-async def start(update: Update, context):
-    await update.message.reply_text("Hello, World!")
+from telebot.async_telebot import AsyncTeleBot
+from telebot.types import Message
+async def start(bot:AsyncTeleBot,message:Message):
+    await bot.reply_to(message, "Hello, world!")
     return
