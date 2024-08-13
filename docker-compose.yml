@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  sese:
+    image: hsn8086/hcn-bot:latest
+    restart: unless-stopped
+    environment:
+      # 你可能需要更改此处的代理
+      https_proxy: http://127.0.0.1:10808
+      http_proxy: http://127.0.0.1:10808
+    # 你可能需要更改挂载的位置
+    # volumes:
+      # - "/tmp/config.toml:/code/config.toml"
