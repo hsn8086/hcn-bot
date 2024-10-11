@@ -1,43 +1,24 @@
-FROM python:3.11.9-alpine3.20
-LABEL Author "hsn8086 <hsn8086@github.com>"
+FROM python:3.11-bookworm
+LABEL authors="hsn8086"
 
 
-ENV PYTHONUNBUFFERED=1
+WORKDIR /app
 
-ENV HOME=/tmp
-RUN addgroup -S hcn-bot && adduser -S hcn-bot -G hcn-bot -h /tmp -s /bin/sh
-
-WORKDIR /code/
-
-# Install packages
-#RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.sjtug.sjtu.edu.cn/g' /etc/apk/repositories
-RUN apk update && \
-    apk add libxslt-dev libxml2-dev gcc g++ libffi-dev musl-dev linux-headers git && \
-    rm  -rf /tmp/* /var/cache/apk/*
-
-RUN echo "root:$(echo $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | sha512sum | cut -d " " -f 1 )" | chpasswd
-RUN echo "hcn-bot:$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)" | chpasswd
-
-RUN chown hcn-bot:hcn-bot /code
-
-USER hcn-bot
-
-COPY ./hcn-bot-building /code
+#RUN addgroup hcn-bot
+#RUN adduser hcn-bot --ingroup hcn-bot
+#RUN echo "root:$(echo $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | sha512sum | cut -d " " -f 1 )" | chpasswd
+#RUN echo "hcn-bot:$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)" | chpasswd
+#
+#RUN chown hcn-bot:hcn-bot /app
 
 USER root
-
+COPY . /app
+# download chrome
+RUN apt update && apt install chromium chromium-driver -y -q
 RUN pip install poetry
 
-USER hcn-bot
-
+#USER hcn-bot
 RUN poetry install
+ENTRYPOINT ["poetry", "run", "python", "start.py"]
 
-USER root
 
-RUN apk del libffi-dev musl-dev linux-headers git
-
-USER hcn-bot
-
-COPY entrypoint.sh /entrypoint.sh
-
-ENTRYPOINT [ "/entrypoint.sh" ]

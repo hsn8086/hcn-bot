@@ -26,13 +26,13 @@
 import argparse
 import asyncio
 import logging
-import tomllib
 from pathlib import Path
 from typing import Callable
 
 from telebot.async_telebot import AsyncTeleBot
 
-from .handlers import start,quote_handler
+from .config import Config
+from .handlers import start, quote_handler
 
 
 def handle_builder(bot: AsyncTeleBot):
@@ -46,7 +46,6 @@ def handle_builder(bot: AsyncTeleBot):
 
 def main():
     # logging
-    logging.basicConfig(datefmt="%Y-%m-%d %H:%M:%S", format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     logger = logging.getLogger('main')
     parser = argparse.ArgumentParser()
@@ -56,13 +55,13 @@ def main():
     if not config_path.exists():
         logger.error(f"config file not found.")
         return
-
     try:
-        with config_path.open("rb") as f:
-            config = tomllib.load(f)
+        config = Config(config_path).config
     except Exception as e:
         logger.error(f"error loading config file: {e}")
         return
+    logging.basicConfig(datefmt="%Y-%m-%d %H:%M:%S", format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                        level=config.get("logging", {}).get("level", 20))
 
     token: str = config.get("telegram", {}).get("token", "")
     if token is None or token == "":
@@ -73,4 +72,3 @@ def main():
     add_handler(start, commands=["start"])
     add_handler(quote_handler, commands=["quote"])
     asyncio.run(bot.infinity_polling())
-

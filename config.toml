@@ -1,2 +1,4 @@
 [telegram]
-    token = "your token"
+token = "your token"
+[logging]
+level = 20

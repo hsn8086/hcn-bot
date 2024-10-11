@@ -1,17 +1,19 @@
 [tool.poetry]
 name = "hcn-bot"
-version = "0.1.0"
+version = "0.1.3"
 description = ""
 authors = ["hsn <hsn1919810@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-anyquote = {url = "https://files.pythonhosted.org/packages/29/e6/e4c66b5a7effba6ddad148f1c86474c1ac1adce5d36f5232cfda2529be36/anyquote-0.2.2-py3-none-any.whl"}
 pytelegrambotapi = "^4.22.0"
 aiohttp = "^3.10.3"
+invoke = "^2.2.0"
+anyquote = {git = "https://github.com/Suto-Commune/anyquote.git"}
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

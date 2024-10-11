@@ -34,11 +34,13 @@ from anyquote import quote_twitter
 from telebot.async_telebot import AsyncTeleBot
 from telebot.types import Message
 
+from src.config import Config
 
-async def async_quote_twitter(url):
+
+async def async_quote_twitter(url, *, driver=None):
     loop = asyncio.get_event_loop()
     with ThreadPoolExecutor() as pool:
-        return await loop.run_in_executor(pool, quote_twitter, url)
+        return await loop.run_in_executor(pool, lambda: quote_twitter(url, driver=driver))
 
 
 async def quote_handler(bot: AsyncTeleBot, message: Message):
@@ -48,9 +50,16 @@ async def quote_handler(bot: AsyncTeleBot, message: Message):
         url = sl[1]
 
         m = await bot.send_message(message.chat.id, "generating quote...", reply_to_message_id=message.message_id)
-
+        from selenium.webdriver.chrome.options import Options
+        from selenium import webdriver
         # img = await async_quote_twitter(url)
-        _img = await async_quote_twitter(url)
+        options = Options()
+        options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+        options.add_argument("--headless")
+        options.add_argument("no-sandbox")
+        options.add_argument("--disable-extensions")
+        driver = webdriver.Chrome(options=options)
+        _img = await async_quote_twitter(url,driver=driver)
         _io = BytesIO()
         _img.save(_io, format="PNG")
         _io.seek(0)

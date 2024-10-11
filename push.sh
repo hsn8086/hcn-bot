@@ -1,1 +1,0 @@
-docker push hsn8086/hcn-bot:latest
